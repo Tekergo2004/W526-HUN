@@ -196,7 +196,15 @@ int link-to-dst
 
 
 
-# RADIUS:
+# Radius for SSH:
+username backup priv 15 sec password
+aaa new-model
+aaa authentication login default group radius local
+radius server RADIUS
+  address ipv4 192.168.1.15 auth-port 1812 acct-port 1813
+  key winRadius
+  exit
+line vty 0 15
+  login authentication default 
+  exit
 
-
-# ETHERCHANNEL:
