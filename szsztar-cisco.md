@@ -155,17 +155,17 @@ ip authentication key-chain eigrp x CHAINNAME
 ## Default configuration
 ```
 interface g0/0 (link to client network)
-standby version 2
-standby [0-4095] 
- - ip gateway-address
- - priority [1-255] (higher is active)
- - preempt
- - authentication
-   - password (max 8 char)
-   - md5 
-     - key-chain CHAINNAME
-     - key-string password (max 64 char)
-   - text password (max 8 char)
+ standby version 2
+ standby [0-4095] 
+  - ip gateway-address
+  - priority [1-255] (higher is active)
+  - preempt
+  - authentication
+    - password (max 8 char)
+    - md5 
+      - key-chain CHAINNAME
+      - key-string password (max 64 char)
+    - text password (max 8 char)
 ```
 
 ## Tracking using SLA
