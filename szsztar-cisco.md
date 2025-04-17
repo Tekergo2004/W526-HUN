@@ -41,7 +41,6 @@ ip vrf forwarding Customer1
 ### Configure routing for VRFs
 ```
 ip route vrf Customer1 0.0.0.0 0.0.0.0 1.1.1.1
-
 ```
 
 ```
