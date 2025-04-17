@@ -196,7 +196,7 @@ int link-to-dst
 
 
 
-RADIUS:
+# RADIUS:
 
 
-ETHERCHANNEL:
+# ETHERCHANNEL:
