@@ -14,10 +14,10 @@ ipv6 unicast-routing
 R1
 ```
 int tunnel0 
-tunnel source fa0/0
-tunnel destination 2.2.2.2
-tunnel mode ipv6ip
-ipv6 add 1111::1/64
+ tunnel source fa0/0
+ tunnel destination 2.2.2.2
+ tunnel mode ipv6ip
+ ipv6 add 1111::1/64
 ```
 
 ## VRF:
@@ -35,7 +35,7 @@ If you want to enable different address families, you have to type address-famil
 ### Adding VRF to an interface
 ```
 int g0/1
-ip vrf forwarding Customer1
+ ip vrf forwarding Customer1
 ```
 
 ### Configure routing for VRFs
@@ -45,20 +45,20 @@ ip route vrf Customer1 0.0.0.0 0.0.0.0 1.1.1.1
 
 ```
 router ospf x vrf Customer1
-address-family ipv4 unicast vrf CustomerX
+ address-family ipv4 unicast vrf CustomerX
 
 router ospfv3 1 
-address-family ipv6 unicast vrf CustomerX
+ address-family ipv6 unicast vrf CustomerX
 ```
 
 ```
 router eigrp IPCisco
-address-family ipv4/ipv6 unicast vrf Customer1 autonomous-system 100
+ address-family ipv4/ipv6 unicast vrf Customer1 autonomous-system 100
 ```
 
 ```
 router bgp 100
-address-family ipv4/ipv6 vrf Customer1
+ address-family ipv4/ipv6 vrf Customer1
 ```
 
 
@@ -74,13 +74,13 @@ If it has a route to a subnet, you can add a network in bgp.
 R1:
 ```
 router bgp 1
-neighbor 1.1.1.2 remote-as 2
+ neighbor 1.1.1.2 remote-as 2
 ```
 
 R2:
 ```
 router bgp 2
-neighbor 1.1.1.1 remote-as 1
+ neighbor 1.1.1.1 remote-as 1
 ```
 
 ### iBGP
@@ -89,10 +89,10 @@ Configure connection between private subnet using remote with the same AS number
 ### Best path selection
 ```
 route-map RM_AS_PATH_PREPEND
-set as-path prepend 200 200
+ set as-path prepend 200 200
 exit
 router bgp 100
-neighbor 1.1.1.1 route-map RM_AS_PATH_PREPEND
+ neighbor 1.1.1.1 route-map RM_AS_PATH_PREPEND
 end
 clear ip bgp 1.1.1.1 soft in
 ```
@@ -106,41 +106,41 @@ ipv6 cef
 ### Interface config
 ```
 interface g0/1
-ipv6 add ..
-ipv6 add fe80::1 link-local
-ipv6 ospf 1 area 0
+ ipv6 add ..
+ ipv6 add fe80::1 link-local
+ ipv6 ospf 1 area 0
 ```
 ### Area config
 ```
 ipv6 router ospf 1
-router-id 1.1.1.1
-area 2 stub (--> stub area megadása, ha használunk több areát)
+ router-id 1.1.1.1
+ area 2 stub (--> stub area megadása, ha használunk több areát)
 ```
 
 ## EIGRP:
 ### Default config
 ```
 router eigrp x
-eigrp router-id 1.1.1.1 ???
-redistribute static
-no auto-summary
-ip summary-address eigrp 1 192.168.0.0 255.255.252.0 5
-redistribute dforg-prot metric 1000 0 1 255 255 
+ eigrp router-id 1.1.1.1 ???
+ redistribute static
+ no auto-summary
+ ip summary-address eigrp 1 192.168.0.0 255.255.252.0 5
+ redistribute dforg-prot metric 1000 0 1 255 255 
 ```
 
 ### Messeage authentication:
 ```
 key chain CHAINNAME
-key x
-key-string password
-exit
-exit
+ key x
+  key-string password
+  exit
+ exit
 ```
 
 ```
 interface g0/1 (link-where you want to authenticate EIGRP messages)
-ip authentication mode eigrp x md5
-ip authentication key-chain eigrp x CHAINNAME
+ ip authentication mode eigrp x md5
+ ip authentication key-chain eigrp x CHAINNAME
 ```
 
 ### Show commands:
@@ -181,20 +181,19 @@ track y ip sla x reachability
 (You have a proper working HSRP using preemption and priorty setting)
 ```
 int link-to-dst
-standby z track y decrement 10
-                ^            ^
-                |            |
-                |            |
-            track-number     |
-                             |
-          how much the priority will be decremented
+ standby z track y decrement 10
+                 ^            ^
+                 |            |
+                 |            |
+             track-number     |
+                              |
+           how much the priority will be decremented
 ```
 
 ### Show commands
-```
-sh standby
-sh track
-```
+- sh standby
+- sh track
+
 
 
 RADIUS:
