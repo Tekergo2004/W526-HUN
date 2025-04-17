@@ -4,10 +4,70 @@ ipv6 unicast-routing
 ```
 
 ## TUNNELING:
+(R1) fa0/0{1.1.1.1}< -- ISP -- >{2.2.2.2}fa0/0 (R2)
+### Neccessary config
+```
+ipv6 unicast-routing
+```
 
+### Tunnel configuration
+R1
+```
+int tunnel0 
+tunnel source fa0/0
+tunnel destination 2.2.2.2
+tunnel mode ipv6ip
+ipv6 add 1111::1/64
+```
 
 ## VRF:
+### Creating VRF
+```
+vrf definition Customer1
+```
 
+```
+ip vrf Customer1
+```
+
+If you want to enable different address families, you have to type address-family {ipv4/ipv6} in vrf configuration mode
+
+### Adding VRF to an interface
+```
+int g0/1
+ip vrf forwarding Customer1
+```
+
+### Configure routing for VRFs
+```
+ip route vrf Customer1 0.0.0.0 0.0.0.0 1.1.1.1
+
+```
+
+```
+router ospf x vrf Customer1
+address-family ipv4 unicast vrf CustomerX
+
+router ospfv3 1 
+address-family ipv6 unicast vrf CustomerX
+```
+
+```
+router eigrp IPCisco
+address-family ipv4/ipv6 unicast vrf Customer1 autonomous-system 100
+```
+
+```
+router bgp 100
+address-family ipv4/ipv6 vrf Customer1
+```
+
+
+
+### Show commands
+- sh ip vrf
+- sh ip route vrf Customer1 
+- ping vrf Customer1 1.1.1.1
 
 ## BGP:
 (R1)[AS 1] fa0/0{1.1.1.1}< --- >{1.1.1.2}fa0/0 [AS 2](R2)
@@ -114,7 +174,7 @@ standby [0-4095]
 ```
 ip sla x
 icmp-echo dst-add source-interface link-to-dst
-ip sla schedule 1 life forever start-time now
+ip sla schedule x life forever start-time now
 track y ip sla x reachability
 ```
 
