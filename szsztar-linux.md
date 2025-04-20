@@ -180,6 +180,177 @@ subnet 10.10.10.0 netmask 255.255.255.0 {
 
 ## HAproxy
 
+### /etc/default/haproxy
+
+```conf
+ENABLED=1
+```
+
+### Matching paths
+
+```conf
+acl url_blog path_beg /blog
+```
+
+### Frontend
+
+>[!NOTE]
+> HTTP with redirect to HTTPS
+
+```conf
+frontend http-in
+    bind :::80
+    redirect scheme https if !{ ssl_fc }
+```
+
+>[!NOTE]
+> HTTP with ACL`s, Layer 7 load balancing
+
+```conf
+frontend http-in
+    bind :::80
+    mode http
+
+    acl url_blog path_beg /blog
+    use_backend blog-backend if url_blog
+    
+    default_backend web-backend
+```
+
+>[!NOTE]
+> HTTPS
+
+```conf
+frontend https-in
+    bind :::443 ssl crt /cert/web.pem
+    default_backend web_servers
+```
+
+### Backend
+
+```conf
+backend web-backend
+   balance roundrobin
+   server web1 web1.yourdomain.com:80 check
+   server web2 web2.yourdomain.com:80 check
+
+   mode http # Layer 7 proxy will be used
+```
+
+### Load balancing modes
+
+- roundrobin > select server in turns
+- leastconn > select the servers with least connections
+- source > selects server based on hash of the clients IP
+
+### Layer 4 loadbalancing
+
+`/etc/haproxy/haproxy.cfg`
+
+```config
+...
+
+defaults
+    mode tcp
+    option tcplog
+
+...
+
+frontend www
+    bind :::80
+    deafult_backend wordpress-backend
+
+backend wordpress-backend
+    balance roundrobin
+    mode tcp
+    server wordpress-1  10.10.10.10:80 check
+    server wordpress-2  10.10.10.20:80 check
+```
+
+### Layer 7 loadbalancing
+
+`/etc/haproxy/haproxy.cfg`
+
+```config
+...
+
+defaults
+    mode http
+    option httplog
+
+...
+
+frontend www
+    bind :::80
+    deafult_backend wordpress-backend
+
+    option http-server-close
+    acl url_wordpress path_beg /wordpress
+    use_backend wordpress-backend if url_wordpress
+
+    default_backend web-backend
+
+backend wordpress-backend
+    balance roundrobin
+    reqrep ^([^\ :]*)\ /wordpress/(.*) \1\ /\2
+    server wordpress-1 10.10.10.10:80 check
+    server wordpress-2 10.10.10.20:80 check
+
+
+backend wordpress-backend
+    server web-1  10.10.10.30:80 check
+
+listen stats
+    bind :1936
+    stats enable
+    stats scope www
+    stats scope web-backend
+    stats scope wordpress-backend
+    stats uri /
+    stats realm Haproxy\ Statistics
+    stats auth user:password
+```
+
+#### HTTPS setup
+
+`/etc/haproxy/haproxy.cfg`
+
+```config
+global
+    maxconn 2048
+    tune.ssl.default-dh-param 2048
+
+...
+
+defaults
+    option forwardfor
+    option http-server-close
+
+    stats enable
+    stats uri /stats
+    stats realm Haproxy\ Statistics
+    stats auth user:password
+
+...
+
+frontend www-http
+   bind haproxy_www_public_IP:80
+   reqadd X-Forwarded-Proto:\ http
+   default_backend www-backend
+
+frontend www-https
+   bind haproxy_www_public_IP:443 ssl crt /etc/ssl/private/example.com.pem
+   reqadd X-Forwarded-Proto:\ https
+   default_backend www-backend
+
+backend www-backend
+   redirect scheme https if !{ ssl_fc }
+   server www-1 www_1_private_IP:80 check
+   server www-2 www_2_private_IP:80 check
+```
+
 ## PKI
 
 ## Apache2
+
+## nftables
