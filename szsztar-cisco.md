@@ -95,11 +95,31 @@ clear ip bgp x.x.x.x soft in
 ```
 
 #### Manipulate weight
-The highest **weight** will be prefered. The deafult **weight** of the paths will be **0**
+The highest **_weight_** will be prefered. The deafult **_weight_** of the paths will be **_0_**.
 ```
 neighbor x.x.x.x weight 1
 ```
 
+#### Manipulating LOCAL PREFERENCE
+The highest _**local preference**_ is preferred. It does that, prefer the next hop address of x.x.x.x  for the z.z.z.z/24 prefix.
+
+```
+```
+
+#### Manipulating LOCAL PREFERENCE
+The highest _**local preference**_ is preferred. It does that, prefer the next hop address of x.x.x.x  for the z.z.z.z/24 prefix.
+
+```
+```
+
+#### Manipulating LOCAL PREFERENCE
+The highest _**local preference**_ is preferred. It does that, prefer the next hop address of x.x.x.x  for the z.z.z.z/24 prefix.
+
+```
+```
+
+#### Manipulating LOCAL PREFERENCE
+The highest _**local preference**_ is preferred. It does that, prefer the next hop address of x.x.x.x  for the z.z.z.z/24 prefix.
 ```
 route-map RM_AS_PATH_PREPEND
  set as-path prepend 200 200
