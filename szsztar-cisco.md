@@ -87,6 +87,19 @@ router bgp 2
 Configure connection between private subnet using remote with the same AS number. 
 
 ### Best path selection
+
+#### Route refresh
+
+```
+clear ip bgp x.x.x.x soft in
+```
+
+#### Manipulate weight
+The highest **weight** will be prefered. The deafult **weight** of the paths will be **0**
+```
+neighbor x.x.x.x weight 1
+```
+
 ```
 route-map RM_AS_PATH_PREPEND
  set as-path prepend 200 200
