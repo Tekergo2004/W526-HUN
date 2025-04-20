@@ -351,7 +351,39 @@ backend www-backend
 
 ## Apache2
 
+> [!NOTE]
+> Example config
+
+```cfg
+<VirtualHost *:80>
+    ServerName web.company.com
+
+    DocumentRoot /var/www/html
+    DirectoryIndex index.html index.php index.html
+
+    <Directory /var/www/html>
+        Options Indexes FollowSymLinks # Enable indexing for site
+        AllowOverride None
+        Require all granted
+    </Directory>
+
+    ErrorDocument 404 error.html # Error documents
+    Alias /whoami /opt/wwwroot/whoami/main.html # Alias for anything
+    
+    # Logging
+    ErrorLog /var/log/apache2/company/error.log
+    CustomLog /var/log/apache2/company/access.log combined
+    
+    
+    # Redirect to https
+    Redirect permanent / https://web.company.com/
+</VirtualHost>
+```
+
 ## NFTables
+
+> [!NOTE]
+> How to filter?
 
 - `ip saddr <IPv4 address / prefix>`
   - Example: `ip saddr {10.1.0.0/24, 10.2.0.0/24}`
@@ -364,6 +396,9 @@ backend www-backend
 - `udp dport <PORT>`
 - `iif <INTERFACE_NAME>`
 - `oif <INTERFACE_NAME>`
+
+> [!NOTE]
+> Example config
 
 ```bash
 #!/usr/sbin/nft -f
@@ -411,3 +446,128 @@ table inet filter {
 ```
 
 ## PKI
+
+### Root Certification Authority
+
+> [!NOTE]
+> Create a root CA to sign all your certificates.
+> Create the CA:
+
+```bash
+mkdir /ca && cd /ca
+
+# Generate CA key
+openssl genrsa -aes256 -out CA.key 4096
+# Generate CA certificate
+openssl req -x509 -new -nodes \
+  -key CA.key -sha256 \
+  -days 365 \
+  -out CA.crt \
+  -subj '/C=HU/O=My Org/CN=My Org Root CA'
+```
+
+> [!NOTE]
+> Add CA certificate to trusted CA certificates on a machine. This is needed for the machine to validate certificates created by this CA.
+
+```sh
+cp CA.crt /usr/local/share/ca-certificates/
+update-ca-certificates
+```
+
+> The `update-ca-certificates` command only reads files with `.crt` extension.
+{.is-warning}
+
+### Subordinate Certification Authority
+
+In order to make a sub CA, you need to generate a signing request and a private key.
+
+```bash
+openssl req -new -nodes \
+  -out subca.csr \
+  -newkey rsa:4096 \
+  -keyout subca.key \
+  -subj '/C=HU/O=My Org/CN=My Org SubCA'
+```
+
+Create a file for the v3 extensions.
+
+<kbd>subca.v3.ext</kbd>
+
+```bash
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid:always,issuer
+basicConstraints=CA:TRUE
+```
+
+Sign the certificate with the root CA certificate. Make sure to include the v3 extension file.
+
+```bash
+openssl x509 -req \
+  -in subca.csr \
+  -CA CA.crt \
+  -CAkey CA.key \
+  -CAcreateserial \
+  -out subca.crt \
+  -days 365 \
+  -sha256 \
+  -extfile subca.v3.ext
+```
+
+### Generate certificates
+
+To generate a certificate, first create a signing request (CSR). This command will also create the key alongside the request.
+
+```bash
+openssl req -new -nodes \
+  -out CERT.csr \
+  -newkey rsa:4096 \
+  -keyout CERT.key \
+  -subj '/C=HU/O=My Org/CN=<FQDN>'
+```
+
+Create and edit the file `CERT.v3.ext`. This will be used to supply the x509v3 extensions for signing the certificate.
+
+```bash
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage=digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName=@alt_names
+
+# Add any alternative DNS names or IP addresses for the certificate
+[alt_names]
+DNS.1 = <Domain Address>
+IP.1 = <IP Address>
+```
+
+> [!NOTE]
+> Sign the certificate. This will output the certificate file which can be used with the key file.
+
+```bash
+openssl x509 -req \
+  -in CERT.csr \
+  -CA CA.crt \
+  -CAkey CA.key \
+  -CAcreateserial \
+  -out CERT.crt \
+  -days 365 \
+  -sha256 \
+  -extfile CERT.v3.ext
+```
+
+> [!NOTE]
+> If needed, bundle a certificate and its key into a pkcs12 pack:
+
+```bash
+openssl pkcs12 -export \
+  -inkey CERT.key \
+  -in CERT.crt \
+  -out CERT.p12
+```
+
+### Test a service running SSL/TLS
+
+Connect to a service using openssl
+
+```bash
+openssl s_client -connect <host>:<port>
+```
