@@ -138,12 +138,12 @@ remaining-reverse-IP    IN  PTR    FQDN
 
 ## DDNS (ISC-DHCP-SERVER)
 
-> [!INFO]
+> [!NOTE]
 > I used `isc-dhcp-server` package for this configuration. Get the key what have been generated above in DNS config.
 
 ### /etc/deafult/isc-dhcp-server
 
-> [!INFO]
+> [!NOTE]
 > Set your interface
 
 ```dhcp
@@ -152,7 +152,7 @@ INTERFACES="ens33"
 
 ### /etc/dhcp/dhcpd.conf
 
-> [!INFO]
+> [!NOTE]
 > You have plenty of examples. Pick one that fits most of your needs, end add these lines for DDNS:
 
 ```dhcp
