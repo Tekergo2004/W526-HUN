@@ -4,7 +4,7 @@
 
 ### named.conf.options
 
-```dns
+```conf
     ...
 
     # Where to forward the queries (hierarchy). Both IPv4, IPv6 addresses can be used.
@@ -32,7 +32,7 @@
 
 ### named.conf.local (zone configurations)
 
-```dns
+```conf
 acl dmz-servers {
     10.10.10.10;
     2001:db8:1010:10::10;
@@ -91,11 +91,11 @@ zone ddns.net IN {
 > [!NOTE]
 > With Bind9 installation you get a tool named `tsig-keygen` you can use it to generate sha-1? keys.
 
-```bash
+```sh
 tsig keygen ddns > /etc/bind/ddns.key 
 ```
 
-```dns
+```conf
 include "/etc/bind/ddns.key"
 
 zone x.z IN {
@@ -146,8 +146,12 @@ remaining-reverse-IP    IN  PTR    FQDN
 > [!NOTE]
 > Set your interface
 
-```dhcp
+```conf
+...
+
 INTERFACES="ens33"
+
+...
 ```
 
 ### /etc/dhcp/dhcpd.conf
@@ -155,7 +159,7 @@ INTERFACES="ens33"
 > [!NOTE]
 > You have plenty of examples. Pick one that fits most of your needs, end add these lines for DDNS:
 
-```dhcp
+```conf
 include "/etc/dhcp/ddns.key";
 
 ddns-updates on;
