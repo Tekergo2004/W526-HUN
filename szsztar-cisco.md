@@ -101,28 +101,55 @@ neighbor x.x.x.x weight 1
 ```
 
 #### Manipulating LOCAL PREFERENCE
-The highest _**local preference**_ is preferred. It does that, prefer the next hop address of x.x.x.x  for the z.z.z.z/24 prefix.
+The highest _**local preference**_ is preferred. It does that, prefer the next hop address of x.x.x.x  for the z.z.z.z/24 prefix. The deafult is **_100_**.
 
 ```
+route-map RM_LOCAL_PREF permit 10
+ set local-preference 101
+ exit
+
+router bgp 100
+ neighbor x.x.x.x route-map RM_LOCAL_PREF in
+ end
+
+clear ip bgp x.x.x.x soft in
 ```
 
-#### Manipulating LOCAL PREFERENCE
-The highest _**local preference**_ is preferred. It does that, prefer the next hop address of x.x.x.x  for the z.z.z.z/24 prefix.
+#### Manipulating AS PATH
+The shorthest _**AS Path**_ is preferred. It's adding additional hops to the AS Path to the network. It can be in- or outbund rule. This configuration will append AS 200 twice to the end of the path.
 
-```
-```
-
-#### Manipulating LOCAL PREFERENCE
-The highest _**local preference**_ is preferred. It does that, prefer the next hop address of x.x.x.x  for the z.z.z.z/24 prefix.
-
-```
-```
-
-#### Manipulating LOCAL PREFERENCE
-The highest _**local preference**_ is preferred. It does that, prefer the next hop address of x.x.x.x  for the z.z.z.z/24 prefix.
 ```
 route-map RM_AS_PATH_PREPEND
  set as-path prepend 200 200
+exit
+
+router bgp 100
+ neighbor x.x.x.x route-map RM_AS_PATH_PREPEND in
+end
+
+clear ip bgp x.x.x.x soft in
+```
+
+#### Manipulating MED
+The lowest _**MED**_ is preferred. It does that, prefer the next hop address of x.x.x.x  for the z.z.z.z/24 prefix.
+
+```
+route-map RM_MED premit 10
+ set metric 1
+ exit
+
+router bgp 100
+ neighbor x.x.x.x route-map RM_MED out
+ end
+
+clear ip bgp 1.1.1.1 soft in
+```
+
+#### Instlaling Multiple Paths
+The highest _**local preference**_ is preferred. It does that, prefer the next hop address of x.x.x.x  for the z.z.z.z/24 prefix.
+```
+route-map RM_AS_PATH_PREPEND
+ set as-path prepend 200 200 
 exit
 router bgp 100
  neighbor 1.1.1.1 route-map RM_AS_PATH_PREPEND
