@@ -349,8 +349,64 @@ backend www-backend
    server www-2 www_2_private_IP:80 check
 ```
 
-## PKI
-
 ## Apache2
 
-## nftables
+## NFTables
+
+- `ip saddr <IPv4 address / prefix>`
+  - Example: `ip saddr {10.1.0.0/24, 10.2.0.0/24}`
+- `ip daddr <IPv4 address / prefix>`
+- `ip6 saddr <IPv6>`
+- `ip6 daddr <IPv6>`
+- `tcp sport <PORT>`
+- `tcp dport <PORT>`
+- `udp sport <PORT>`
+- `udp dport <PORT>`
+- `iif <INTERFACE_NAME>`
+- `oif <INTERFACE_NAME>`
+
+```bash
+#!/usr/sbin/nft -f
+
+flush ruleset
+
+define INT4 = { 10.1.10.0/24 }
+
+define INT_DMZ4 = { $INT4, 10.1.20.0/24 }
+define INT_DMZ6 = { 2001:db8:1001:10::/64, 2001:db8:1001:20::/64 }
+
+table inet filter {
+	chain forward {
+		type filter hook forward priority forward;
+		# Apply default drop policy
+		policy drop;
+    
+		# Accept return traffic
+		ct state { established, related } accept;
+    
+		# Allow traffic from INT and DMZ to internet
+		ip saddr $INT_DMZ4 oif ens18 accept;
+		ip6 saddr $INT_DMZ6 oif ens18 accept;
+	}
+    
+    chain srcnat {
+		type nat hook postrouting priority srcnat;
+    
+		# Configure PAT for INT and DMZ networks
+		ip saddr { 10.1.10.0/24, 10.1.20.0/24 } oif ens18 masquerade;
+	}
+  
+	chain dstnat {
+		type nat hook prerouting priority dstnat;
+    
+		# Create port forwarding rules for external HTTP(S) and DNS traffic
+		ip daddr 1.1.1.10 tcp dport { 53,80,443 } dnat to 10.1.20.20;
+		ip daddr 1.1.1.10 udp dport 53 dnat to 10.1.20.20;
+    
+		# Route INT and VPN networks to transparent HTTP proxy running on this host
+		ip saddr { 10.1.10.0/24, 10.1.30.0/24 } tcp dport 80 redirect to 3128;
+		ip6 saddr { 2001:db8:1001:10::/64, 2001:db8:1001:30::/64 } tcp dport 80 redirect to 3128;
+	}
+}
+
+## PKI
