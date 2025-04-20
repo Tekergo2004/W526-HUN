@@ -408,5 +408,6 @@ table inet filter {
 		ip6 saddr { 2001:db8:1001:10::/64, 2001:db8:1001:30::/64 } tcp dport 80 redirect to 3128;
 	}
 }
+```
 
 ## PKI
