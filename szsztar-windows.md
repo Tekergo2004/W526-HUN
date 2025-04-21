@@ -214,3 +214,34 @@ foreach ($group in $groups) {
 ```
 
 ## Hyper-V
+
+### Installation
+
+```ps
+Install-WindowsFeature -Name Hyper-V -IncludeManagementTools -Restart
+```
+
+### Virtual switch types
+
+- Internal (VM <--> host)
+- External (Bridge)
+- Private (VM)
+
+```ps
+New-VMSwitch -name "Interace-name" -switchtype internal/external/private
+Get-VMSwitch
+```
+
+### Nested virtualization
+
+```ps
+Set-VMProcessor -VMName <VMName> -ExposeVirtualizationExtensions $true
+```
+
+### MAC address spoofing
+
+Should be enabled on the physical Hyper-V host
+
+```ps
+Set-VMNetworkAdapter -VMName <VMName> | Set-VMNetworkAdapter -MacAddressSpoofing On
+```
