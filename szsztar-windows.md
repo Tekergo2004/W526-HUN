@@ -2,7 +2,65 @@
 
 ## ADCS
 
-## RDS
+## [RDS](https://msfreaks.wordpress.com/2018/10/06/step-by-step-windows-2019-remote-desktop-services-using-the-gui/)
+
+> [!NOTE]
+> If you have to set up RDS on just one device use session based, quick config and it will be done much faster.
+
+### 2 Servers
+
+> [!NOTE]
+> In this scenaro I will have two Windows servers where the following services will be configured. ADDS has been preconfigured.
+
+#### SRV1
+
+- DC
+- ADCS
+- RD Licensing
+
+#### SRV2
+
+- RD Web Access
+- RD Gateway
+- RD Connection Broker
+- RD SessionHost
+
+#### Settings
+
+- Standard Deployment
+- Session-based desktop deployment
+- RD Connection Broker > SRV2
+- RD Web Access >  check in the checkbox
+- RD Session Host > SRV2
+- Check in _Restart .... if required_ and press **Install**
+
+#### After deployment
+
+> [!NOTE]
+> Go to RDS overview and do these steps:
+
+- Click RD Licensing > Choose SRV1
+- Click RD Gateway > Choose SRV2
+- | --> type SRV2's FQDN
+- Press Tasks and choose Edit Deployment Process from the dropdown menu
+- | --> RD Gateway > Use These RD Gateway server settings, type in FQDN, choose Password authentication and check in both checkboxes
+- | --> RD Licensing > Choose Per User
+- | --> RD Web Access > Next
+- | --> Certificates > Create certificate, export it into .pfx and import them here.
+
+#### DNS
+
+> [!NOTE]
+> If you haven't done already create a DNS zone and record for the server.
+
+#### Collections
+
+- Go to collections click **Tasks** and choose **Create Session Collection** from the Dropdown menu
+- Name it as you want and give it a description if you need.
+- Choose RD Session Host from the menu (it will show SRV2 if you done it in the way i had).
+- Specify a **user group** that can access this collection (if you're using child domains you have to do [this](https://wiki.penguin.hu/virtualization/remoteapp) workaround)
+- Check in **Enable user profile disks**
+- You're done with the configuration.
 
 ## GPO
 
