@@ -93,11 +93,18 @@ R2:
 ```cisco
 router bgp 2
  neighbor 1.1.1.1 remote-as 1
+ neighbor 1.1.1.1 disable-connected-check
 ```
 
 ### iBGP
 
 Configure connection between private subnet using remote with the same AS number.
+
+```cisco
+router bgp 1
+ neighbor 1.1.1.1 remote-as 1
+ neighbor 1.1.1.1 update-source <interface_name>
+```
 
 ### Best path selection
 
@@ -163,7 +170,7 @@ router bgp 100
 clear ip bgp 1.1.1.1 soft in
 ```
 
-#### Instlaling Multiple Paths
+#### Installing Multiple Paths
 
 You can set how much path can be learned for the subnet (deafult is to select one best path).
 
